@@ -6,61 +6,51 @@ This image is not so usefull on its own. It is considered a base image to create
 The image contains a ruby installation and Postresql client. It also allows to include an Oracle client
 installation (e.g. Oracle InstantClient) to support the installation of a ruby-oci8 gem.
 
-The image creates a user 'teneo' and groupu 'teneo' and will run your application as that user from its own home directory '/teneo'.
-
 The image's entrypoint script is located in '/usr/local/bin/start.sh' and will update your bundle if required and start your command.
 
 ## Usage
 Use this image as a base image in your Dockerfile like so:
 
 ```docker
-FROM teneo/ruby:latest
-COPY . /teneo
-CMD ["bundle", "exec", "myapp.rb"]
+FROM libis/teneo-ruby:latest
+...
+```
+
+If you would like to run your application internally as a different user and specify a user and group
+id for that user, you could create your Dockerfile like this:
+
+```docker
+FROM libis/teneo-ruby:latest
+
+# Create application user
+ARG UID=1000
+ARG GID=1000
+ARG HOME_DIR=/teneo
+
+RUN groupadd --gid ${GID} teneo
+RUN useradd --home-dir ${HOME_DIR} --create-home --no-log-init --uid ${UID} --gid ${GID} teneo
+
+# Switch to application user 
+USER teneo
+WORKDIR ${HOME_DIR}
+
+# Copy application data
+COPY . ${HOME_DIR}
+
+# Start application
+CMD ["bundle", "exec", "rack", "up"]
 ```
 
 # Build Configuration
 
 The following build arguments are defined:
 
--   `UID` *internal user id*
--   `GID` *internal group id*
--   `HOME_DIR` *internal user home dir and application dir*
--   `PG_VERSION` *Postgres client version*
--   `ORACLIENT_PATH` *Location of the mounted oracle client package*
 -   `RUBY_VERSION` *Ruby version*
 -   `BUNDLER_VERSION` *Bundler gem version*
 -   `GEMS_PATH` *Location of installed gems*
 -   `RUBY_ENV` *default application environment*
-
-## User settings
-As mentioned above the application will run as the 'teneo:teneo' user. You can select the ids of this 
-user and group by setting the `UID` and `GID` build arguments. You may want to run your dockerized 
-ruby application with the same id as the host user running the container like so:
-
-```
-docker build \
-    --build-arg UID=$(id -u ${USER}) \
-    --build-arg GID=$(id -g ${USER}) \
-    ....
-```
-The internal user id and group id are set when the image is built. It cannot be changed at run-time.
-
-Likewise, it the default user's home and application directory `/teneo` does not suit you, it can be
-changed by setting the build argument `HOME_DIR`.
-
-## Postgresql version
-
-The build argument `PG_VERSION` determines the version of Postgres client that will be installed.
-The installation is performed via `apt install` using the Postgres repository. You should only 
-specify the major version number here as the client package is only identified with the major version.
-
-## Oracle client
-
-If the `ruby-oci8` gem is required, an Oracle client installation is required for this gem to work.
-To reduce the size of the image, an Oracle client installed on the host can be used by binding a
-volume to it. The internal mapping of this volume can be changed by setting the `ORACLIENT_PATH` build 
-argument. The default value is `/oracle-client`.
+-   `PG_VERSION` *Postgres client version*
+-   `ORACLIENT_PATH` *Location of the mounted oracle client package*
 
 ## Ruby
 
@@ -77,6 +67,19 @@ The internal mapping of this volume is determined by the build argument `GEMS_PA
 value is `/bundle-gems`.
 
 The build argument `RUBY_ENV` sets the default value for the environment variable `RUBY_ENV`.
+
+## Postgresql version
+
+The build argument `PG_VERSION` determines the version of Postgres client that will be installed.
+The installation is performed via `apt install` using the Postgres repository. You should only 
+specify the major version number here as the client package is only identified with the major version.
+
+## Oracle client
+
+If the `ruby-oci8` gem is required, an Oracle client installation is required for this gem to work.
+To reduce the size of the image, an Oracle client installed on the host can be used by binding a
+volume to it. The internal mapping of this volume can be changed by setting the `ORACLIENT_PATH` build 
+argument. The default value is `/oracle-client`.
 
 # Run-time configuration
 

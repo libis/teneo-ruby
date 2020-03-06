@@ -49,18 +49,6 @@ RUN gem update --system && \
 COPY start.sh /usr/local/bin/start.sh
 RUN chmod 755 /usr/local/bin/start.sh
 
-# Create application user
-ARG UID=1000
-ARG GID=1000
-ARG HOME_DIR=/teneo
-
-RUN groupadd --gid ${GID} teneo
-RUN useradd --home-dir ${HOME_DIR} --create-home --no-log-init --uid ${UID} --gid ${GID} teneo
-
-# Switch to application user 
-USER teneo
-WORKDIR ${HOME_DIR}
-
 # Location of the installed gems
 ARG GEMS_PATH=/bundle-gems
 VOLUME ${GEMS_PATH}
