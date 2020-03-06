@@ -130,7 +130,7 @@ It is considered best practice to install gems in a volume. This has several adv
 * The image size is reduced as the storage for the gems is not part of the image build.
 * The image build time is reduced.
 * The gems can be cached by persisting the volume reducing the `bundle install` time after the 
-  initial run.
+  initial run. Make sure you create a docker volue and bind it to the `GEMS_PATH` for this.
 * The installed gems can be shared by multiple similar applications reducing required size and 
   initialization time even further.
 
