@@ -15,8 +15,19 @@ RUN apt-get update -qq \
         less \
         git \
         wget \
-        nodejs \
         libaio1 \
+    && apt-get clean \
+    && rm -fr /var/cache/apt/archives/* \
+    && rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp* \
+    && truncate -s 0 /var/log/*log
+
+# Install some Rails requirements NodeJS and yarn
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+    && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
+    && apt-get update -qq \
+    && apt-get install -qqy --no-install-recommends \
+        nodejs \
+        yarn \
     && apt-get clean \
     && rm -fr /var/cache/apt/archives/* \
     && rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp* \
