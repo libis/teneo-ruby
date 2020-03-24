@@ -15,6 +15,7 @@ RUN apt-get update -qq \
         less \
         git \
         wget \
+        nodejs \
         libaio1 \
     && apt-get clean \
     && rm -fr /var/cache/apt/archives/* \
