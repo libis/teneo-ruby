@@ -16,6 +16,7 @@ RUN apt-get update -qq \
         git \
         wget \
         libaio1 \
+        vim \
     && apt-get clean \
     && rm -fr /var/cache/apt/archives/* \
     && rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp* \
