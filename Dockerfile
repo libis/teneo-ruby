@@ -15,6 +15,7 @@ RUN apt-get update -qq \
         less \
         git \
         wget \
+        libsqlite3-dev \
         libaio1 \
         vim \
     && apt-get clean \
@@ -50,10 +51,6 @@ RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-k
     && rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp* \
     && truncate -s 0 /var/log/*log
 
-# Location of the Oracle instance client installation
-ARG ORACLIENT_PATH=/oracle-client
-VOLUME ${ORACLIENT_PATH}
-
 # Upgrade RubyGems and install required Bundler version
 ARG BUNDLER_VERSION=2.1.4
 
@@ -72,9 +69,9 @@ VOLUME ${GEMS_PATH}
 ENV LANG=C.UTF-8 \
     BUNDLE_JOBS=4 \
     BUNDLE_RETRY=3 \
-    LD_LIBRARY_PATH=${ORACLIENT_PATH} \
     BUNDLE_PATH=${GEMS_PATH} \
-    RUBY_ENV=production
+    RUBY_ENV=production \
+    RAILS_ENV=production
 
 ENTRYPOINT [ "/usr/local/bin/start.sh" ]
 CMD [ "bundle", "exec", "irb" ]

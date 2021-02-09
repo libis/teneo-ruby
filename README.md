@@ -3,8 +3,8 @@ Base docker ruby image for Teneo docker images
 
 ## Description
 This image is not so usefull on its own. It is considered a base image to create other images from.
-The image contains a ruby installation and Postresql client. It also allows to include an Oracle client
-installation (e.g. Oracle InstantClient) to support the installation of a ruby-oci8 gem.
+The image contains a ruby installation and Postresql client. The image is prepared to install an Oracle client as well.
+
 
 The image's entrypoint script is located in '/usr/local/bin/start.sh' and will update your bundle if required and start your command.
 
@@ -98,11 +98,6 @@ The following environment variables are defined and set explicitly in the image:
 
     The number of times bundler will retry to install a gem when a connection problem occurs.
 
--   `LD_LIBRARY_PATH`
-
-    The default location(s) where share libraries will be searched at run-time. It is by default set   
-    to the path of the Oracle client: `/oracle-client`
-
 -   `BUNDLE_PATH`
 
     The location where gems are installed. This is set to the value of the `GEMS_PATH` build argument
@@ -112,25 +107,14 @@ The following environment variables are defined and set explicitly in the image:
 
     The application environment. The default value is determined by the `RUBY_ENV` build argument.
 
-## Volumes
+## Gems
 
-Two volumes are defined in this image. Their useage is explained below.
-
-### Oracle client
-
-Due to licensing constraints and in order to keep the image size small, it is not advised to embed 
-an installed Oracle InstantClient in your images. Instead this image is expected to mount a volume 
-with the Oracle InstanceClient installed on the host. The default internal mapping for this volume 
-is defined by the build argument `ORACLIENT_PATH`.
-
-### Gems
-
-It is considered best practice to install gems in a volume. This has several advantages:
+It is considered good practice to keep installed gems in separate volume. This has several advantages:
 
 * The image size is reduced as the storage for the gems is not part of the image build.
 * The image build time is reduced.
 * The gems can be cached by persisting the volume reducing the `bundle install` time after the 
-  initial run. Make sure you create a docker volue and bind it to the `GEMS_PATH` for this.
+  initial run. Make sure you create a docker volume and bind it to the `GEMS_PATH` for this.
 * The installed gems can be shared by multiple similar applications reducing required size and 
   initialization time even further.
 
@@ -139,3 +123,17 @@ The internal mapping for the Gem installation volume can be set with the build a
 Note that the default ENTRYPOINT script will cause the installed gems to be updated when the container 
 is started and before your application is started. It will however only do so when it decides that 
 an install/update is required (thanks to `bundle check`).
+
+## Oracle client
+
+In order to use the ruby-oci8 gem, you need to install an Oracle client (e.g. Oracle InstantClient).
+
+Due to licensing constraints and in order to keep the image size small, it is not advised to embed 
+an installed Oracle InstantClient in your images. Instead you can mount a volume with the Oracle 
+InstantClient installed on the host. You should then also add it to the LD_LIBRARY_PATH environment
+variable:
+
+```
+docker run -v ${HOME}/oracleclient:/opt/oracle/client -e LD_LIBRARY_PATH=/opt/oracle/client libis/teneo-ruby
+```
+
