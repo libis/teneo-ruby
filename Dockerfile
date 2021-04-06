@@ -1,5 +1,5 @@
 # Base image
-ARG RUBY_VERSION=2.6
+ARG RUBY_VERSION=2.7
 
 FROM ruby:${RUBY_VERSION}-slim-buster
 
@@ -52,7 +52,7 @@ RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-k
     && truncate -s 0 /var/log/*log
 
 # Upgrade RubyGems and install required Bundler version
-ARG BUNDLER_VERSION=2.1.4
+ARG BUNDLER_VERSION=2.2.15
 
 RUN gem update --system && \
     gem install bundler:$BUNDLER_VERSION
