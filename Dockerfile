@@ -1,17 +1,16 @@
 # Base image
-ARG RUBY_VERSION=2.7
-ARG PG_VERSION=12
+ARG RUBY_VERSION=3.1
 ARG BUNDLER_VERSION=2.2.15
 ARG GEMS_PATH=/bundle-gems
 
-FROM ruby:${RUBY_VERSION}-slim-buster
+FROM ruby:${RUBY_VERSION}-slim-bookworm
 
 # Silence apt
 RUN dpkg-reconfigure debconf --frontend=noninteractive
 
 # Install common packages
 RUN apt-get update -qq \
-    && apt-get install -qqy --no-install-recommends \
+ && apt-get install -qqy --no-install-recommends \
         build-essential \
         gnupg2 \
         curl \
@@ -21,24 +20,11 @@ RUN apt-get update -qq \
         libsqlite3-dev \
         libaio1 \
         vim \
-    && apt-get clean \
-    && rm -fr /var/cache/apt/archives/* \
-    && rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp* \
-    && truncate -s 0 /var/log/*log
-
-ARG PG_VERSION
-
-# Install PostgreSQL client
-RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
-    && echo "deb http://apt.postgresql.org/pub/repos/apt/ buster-pgdg main" > /etc/apt/sources.list.d/postgres.list \
-    && apt-get update -qq \
-    && apt-get install -qqy --no-install-recommends \
-        libpq-dev \
-        postgresql-client-$PG_VERSION \
-    && apt-get clean \
-    && rm -fr /var/cache/apt/archives/* \
-    && rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp* \
-    && truncate -s 0 /var/log/*log
+        postgresql-client \
+ && apt-get clean \
+ && rm -fr /var/cache/apt/archives/* \
+ && rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp* \
+ && truncate -s 0 /var/log/*log
 
 # Upgrade RubyGems and install required Bundler version
 ARG BUNDLER_VERSION
