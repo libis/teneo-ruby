@@ -18,7 +18,6 @@ publish: build
 build:
 	docker buildx build --tag $(TAG)\
 	 --build-arg RUBY_VERSION=$(RUBY_VERSION)\
-	 --build-arg PG_VERSION=$(PG_VERSION)\
 	 --build-arg BUNDLER_VERSION=$(BUNDLER_VERSION)\
 	 .
 

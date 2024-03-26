@@ -49,7 +49,6 @@ The following build arguments are defined:
 -   `BUNDLER_VERSION` *Bundler gem version*
 -   `GEMS_PATH` *Location of installed gems*
 -   `RUBY_ENV` *default application environment*
--   `PG_VERSION` *Postgres client version*
 -   `ORACLIENT_PATH` *Location of the mounted oracle client package*
 
 ## Ruby
@@ -67,12 +66,6 @@ The internal mapping of this volume is determined by the build argument `GEMS_PA
 value is `/bundle-gems`.
 
 The build argument `RUBY_ENV` sets the default value for the environment variable `RUBY_ENV`.
-
-## Postgresql version
-
-The build argument `PG_VERSION` determines the version of Postgres client that will be installed.
-The installation is performed via `apt install` using the Postgres repository. You should only 
-specify the major version number here as the client package is only identified with the major version.
 
 ## Oracle client
 
