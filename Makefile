@@ -27,7 +27,7 @@ publish-rails: build-rails
 
 build-rails:
 	docker buildx build --tag $(TAG_RAILS)\
-	-f Dockerfile.rails\
-	--build-arg IMAGE_VERSION=$(IMAGE_VERSION)\
-	.
+	 -f Dockerfile.rails\
+	 --build-arg IMAGE_VERSION=$(IMAGE_VERSION)\
+	 .
 	
