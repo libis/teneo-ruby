@@ -19,11 +19,15 @@ build:
 	docker buildx build --tag $(TAG)\
 	 --build-arg RUBY_VERSION=$(RUBY_VERSION)\
 	 --build-arg BUNDLER_VERSION=$(BUNDLER_VERSION)\
+	 --build-arg RUBY_IMAGE_VARIANT=$(RUBY_IMAGE_VARIANT)\
 	 .
 
 publish-rails: build-rails
 	docker push $(TAG_RAILS)
 
 build-rails:
-	docker buildx build --tag $(TAG_RAILS) -f Dockerfile.rails --build-arg BASE_IMAGE_VERSION=$(IMAGE_VERSION) .
+	docker buildx build --tag $(TAG_RAILS)\
+	-f Dockerfile.rails\
+	--build-arg IMAGE_VERSION=$(IMAGE_VERSION)\
+	.
 	

@@ -1,9 +1,10 @@
 # Base image
 ARG RUBY_VERSION=3.1
+ARG RUBY_IMAGE_VARIANT=slim-bookworm
 ARG BUNDLER_VERSION=2.2.15
 ARG GEMS_PATH=/bundle-gems
 
-FROM ruby:${RUBY_VERSION}-slim-bookworm
+FROM ruby:${RUBY_VERSION}-${RUBY_IMAGE_VARIANT}
 
 # Silence apt
 RUN dpkg-reconfigure debconf --frontend=noninteractive
@@ -47,4 +48,4 @@ ENV LANG=C.UTF-8 \
     RUBY_ENV=production
 
 ENTRYPOINT [ "/usr/local/bin/start.sh" ]
-CMD [ "bundle", "exec", "irb" ]
+CMD [ "irb" ]
