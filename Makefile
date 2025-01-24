@@ -19,7 +19,7 @@ build:
 	docker buildx build --tag $(TAG)\
 	 --build-arg RUBY_VERSION=$(RUBY_VERSION)\
 	 --build-arg BUNDLER_VERSION=$(BUNDLER_VERSION)\
-	 --build-arg RUBY_IMAGE_VARIANT=$(RUBY_IMAGE_VARIANT)\
+	 --build-arg GEMS_PATH=$(GEMS_PATH)\
 	 .
 
 publish-rails: build-rails
@@ -30,4 +30,3 @@ build-rails:
 	 -f Dockerfile.rails\
 	 --build-arg IMAGE_VERSION=$(IMAGE_VERSION)\
 	 .
-	
