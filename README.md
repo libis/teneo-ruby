@@ -3,10 +3,9 @@ Base docker ruby image for Teneo docker images
 
 ## Description
 This image is not so usefull on its own. It is considered a base image to create other images from.
-The image contains a ruby installation and Postresql client. The image is prepared to install an Oracle client as well.
+The image contains a ruby installation and Postresql client.
 
-
-The image's entrypoint script is located in '/usr/local/bin/start.sh' and will update your bundle if required and start your command.
+The image's entrypoint script is located in '/usr/local/bin/start.sh' and will start your command with ``bundle exec``. It can optionally run a ``bundle install`` or ``bundle update`` first.
 
 ## Usage
 Use this image as a base image in your Dockerfile like so:
@@ -38,7 +37,7 @@ WORKDIR ${HOME_DIR}
 COPY . ${HOME_DIR}
 
 # Start application
-CMD ["bundle", "exec", "rack", "up"]
+CMD ["rack", "up"]
 ```
 
 # Build Configuration
@@ -47,32 +46,23 @@ The following build arguments are defined:
 
 -   `RUBY_VERSION` *Ruby version*
 -   `BUNDLER_VERSION` *Bundler gem version*
--   `GEMS_PATH` *Location of installed gems*
--   `RUBY_ENV` *default application environment*
--   `ORACLIENT_PATH` *Location of the mounted oracle client package*
+-   `GEMS_PATH` *Default location of installed gems*
 
 ## Ruby
 
 The build argument `RUBY_VERSION` selects the ruby version that will be installed. Note that this 
 image uses the official Ruby docker images a base image. The Ruby version supplied to this image's 
 build command will need to refer to an existsing Ruby base image tag. The `RUBY_VERSION` value will 
-be appended with `-slim-buster` to form the base image tag.
+be appended with `-slim` to form the base image tag.
 
 The `BUNDLER_VERSION` build argument determines the version of the `bundle` gem that will be installed and selected.
 
-The gems will be installed/updated during startup of the container. In order to cache the installed 
+The gems can be installed/updated during startup of the container. In order to cache the installed 
 gems and possible share the gem installation amongst multiple containers, a separate volume is defined.
 The internal mapping of this volume is determined by the build argument `GEMS_PATH`. It's default 
 value is `/bundle-gems`.
 
 The build argument `RUBY_ENV` sets the default value for the environment variable `RUBY_ENV`.
-
-## Oracle client
-
-If the `ruby-oci8` gem is required, an Oracle client installation is required for this gem to work.
-To reduce the size of the image, an Oracle client installed on the host can be used by binding a
-volume to it. The internal mapping of this volume can be changed by setting the `ORACLIENT_PATH` build 
-argument. The default value is `/oracle-client`.
 
 # Run-time configuration
 
@@ -96,13 +86,9 @@ The following environment variables are defined and set explicitly in the image:
     The location where gems are installed. This is set to the value of the `GEMS_PATH` build argument
     by default.
 
--   `RUBY_ENV`
-
-    The application environment. The default value is determined by the `RUBY_ENV` build argument.
-
 ## Gems
 
-It is considered good practice to keep installed gems in separate volume. This has several advantages:
+It is can be a good practice to keep installed gems in separate volume. This has several advantages:
 
 * The image size is reduced as the storage for the gems is not part of the image build.
 * The image build time is reduced.
@@ -113,20 +99,19 @@ It is considered good practice to keep installed gems in separate volume. This h
 
 The internal mapping for the Gem installation volume can be set with the build argument `GEMS_PATH`.
 
-Note that the default ENTRYPOINT script will cause the installed gems to be updated when the container 
-is started and before your application is started. It will however only do so when it decides that 
-an install/update is required (thanks to `bundle check`).
+This is however optional. It is for instance perfectly fine to create your image based of this image with locally installed gems like so:
+```docker
+# Build arguments
+ARG BASE_IMAGE
+ARG APP_DIR=/app
 
-## Oracle client
+FROM ${BASE_IMAGE}
 
-In order to use the ruby-oci8 gem, you need to install an Oracle client (e.g. Oracle InstantClient).
+WORKDIR ${APP_DIR}
+# Configure bundler
 
-Due to licensing constraints and in order to keep the image size small, it is not advised to embed 
-an installed Oracle InstantClient in your images. Instead you can mount a volume with the Oracle 
-InstantClient installed on the host. You should then also add it to the LD_LIBRARY_PATH environment
-variable:
+RUN bundle config set --local deployment 'true'
+RUN bundle config set --local path 'vendor/bundle'
 
+CMD ["app.rb"]
 ```
-docker run -v ${HOME}/oracleclient:/opt/oracle/client -e LD_LIBRARY_PATH=/opt/oracle/client libis/teneo-ruby
-```
-

@@ -4,7 +4,7 @@ ARG RUBY_IMAGE_VARIANT=slim-bookworm
 ARG BUNDLER_VERSION=2.2.15
 ARG GEMS_PATH=/bundle-gems
 
-FROM ruby:${RUBY_VERSION}-${RUBY_IMAGE_VARIANT}
+FROM ruby:${RUBY_VERSION}-slim
 
 # Silence apt
 RUN dpkg-reconfigure debconf --frontend=noninteractive
@@ -27,11 +27,6 @@ RUN apt-get update -qq \
  && rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp* \
  && truncate -s 0 /var/log/*log
 
-# Upgrade RubyGems and install required Bundler version
-ARG BUNDLER_VERSION
-RUN gem update --system && \
-    gem install bundler:${BUNDLER_VERSION}
-
 # Copy Entrypoint script
 COPY start.sh /usr/local/bin/start.sh
 RUN chmod 755 /usr/local/bin/start.sh
@@ -39,13 +34,20 @@ RUN chmod 755 /usr/local/bin/start.sh
 # Location of the installed gems
 ARG GEMS_PATH
 ENV GEMS_PATH=${GEMS_PATH}
+VOLUME ${GEMS_PATH}
 
 # Prepare ruby environment
 ENV LANG=C.UTF-8 \
     BUNDLE_JOBS=4 \
     BUNDLE_RETRY=3 \
-    BUNDLE_PATH=${GEMS_PATH} \
-    RUBY_ENV=production
+    BUNDLE_PATH=${GEMS_PATH}
+
+# Upgrade RubyGems and install required Bundler version
+ARG BUNDLER_VERSION
+COPY Gemfile .
+RUN gem update --system && \
+    gem install bundler:${BUNDLER_VERSION} && \
+    bundle install
 
 ENTRYPOINT [ "/usr/local/bin/start.sh" ]
 CMD [ "irb" ]
