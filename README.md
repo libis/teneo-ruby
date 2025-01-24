@@ -62,6 +62,8 @@ gems and possible share the gem installation amongst multiple containers, a sepa
 The internal mapping of this volume is determined by the build argument `GEMS_PATH`. It's default 
 value is `/bundle-gems`.
 
+The build argument `RUBY_ENV` sets the default value for the environment variable `RUBY_ENV`.
+
 # Run-time configuration
 
 ## Environment variables

@@ -1,5 +1,6 @@
 # Base image
 ARG RUBY_VERSION=3.1
+ARG RUBY_IMAGE_VARIANT=slim-bookworm
 ARG BUNDLER_VERSION=2.2.15
 ARG GEMS_PATH=/bundle-gems
 

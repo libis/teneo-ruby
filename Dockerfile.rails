@@ -1,7 +1,7 @@
 # Base image
-ARG BASE_IMAGE_VERSION
+ARG IMAGE_VERSION
 
-FROM registry.docker.libis.be/teneo/ruby-base:${BASE_IMAGE_VERSION}
+FROM registry.docker.libis.be/teneo/ruby-base:${IMAGE_VERSION}
 
 # Install some Rails requirements NodeJS and yarn
 RUN apt-get update -qq \
