@@ -1,9 +1,10 @@
 # Base image
 ARG RUBY_VERSION=3.1
+ARG OS_VERSION=slim
 ARG BUNDLER_VERSION=2.2.15
 ARG GEMS_PATH=/bundle-gems
 
-FROM ruby:${RUBY_VERSION}-slim
+FROM ruby:${RUBY_VERSION}-${OS_VERSION}
 
 # Silence apt
 RUN dpkg-reconfigure debconf --frontend=noninteractive
@@ -19,7 +20,8 @@ RUN apt-get update -qq \
         wget \
         libsqlite3-dev \
         vim \
-        postgresql-client \
+        libyaml-dev \
+    postgresql-client \
  && apt-get clean \
  && rm -fr /var/cache/apt/archives/* \
  && rm -fr /var/lib/apt/lists/* /tmp/* /var/tmp* \
